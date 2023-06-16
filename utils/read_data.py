@@ -21,13 +21,15 @@ def read_all_data() -> Dict[DATAFRAME_NAME, pd.DataFrame]:
     with Pool() as p:
         result_pool = {"input": p.apply_async(read_input)}
 
-    dataframes = {}
-    completed = dict([dfname, False] for dfname in result_pool.keys())
-    while True:
-        for dfname, result in result_pool.items():
-            if not completed[dfname] and result.ready():
-                print(f"{dfname} is ready")
-                dataframes[dfname] = result.get()
-                completed[dfname] = True
-        if all(completed.values()):
-            break
+        dataframes = {}
+        completed = dict([dfname, False] for dfname in result_pool.keys())
+        while True:
+            for dfname, result in result_pool.items():
+                if not completed[dfname] and result.ready():
+                    print(f"{dfname} is ready")
+                    dataframes[dfname] = result.get()
+                    completed[dfname] = True
+            if all(completed.values()):
+                break
+
+    return dataframes
